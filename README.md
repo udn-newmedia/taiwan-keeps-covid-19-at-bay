@@ -1,4 +1,4 @@
-# how-taiwan-fights-covid-19
+# taiwan-keeps-covid-19-at-bay
 
 ## Project setup
 ```
