@@ -23,6 +23,7 @@ export default {
 <style lang="scss" scoped>
 .taiwan-help-banner {
   position: relative;
+  z-index: 10;
   width: 100%;
   margin: 64px 0;
   img {

@@ -8,7 +8,7 @@ const url = './data/taiwan_can_help.json';
 
 export default new Vuex.Store({
   state: {
-    currentDate: '2019-12-31',
+    currentDate: '12-31-2019',
     data: null,
   },
   mutations: {
@@ -21,10 +21,16 @@ export default new Vuex.Store({
         console.log(error);
       });
     },
+    updatedCurrentDate(state, payload) {
+      state.currentDate = payload;
+    }
   },
   actions: {
-    getData (context) {
+    getData(context) {
       context.commit('getData');
     },
+    updatedCurrentDate(context, payload) {
+      context.commit('updatedCurrentDate', payload);
+    }
   },
 });
