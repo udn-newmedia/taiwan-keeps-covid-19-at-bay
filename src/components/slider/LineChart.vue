@@ -35,11 +35,30 @@
 <script>
 import * as d3 from 'd3';
 
+const parseTime = d3.timeParse('%m-%d-%Y');
+Date.prototype.addDays = function(days) {
+  this.setDate(this.getDate() + days);
+  return this;
+}
+
 export default {
   name: 'LineChart',
   data() {
     return {
-      
+      svg: null,
+      zoom: null,
+      area: null,
+      xAxis: null,
+      scale: {
+        x: null,
+        y: null,
+        xt: null
+      },
+      size: {
+        w: null,
+        h: null,
+        margin: null
+      }
     };
   },
   computed: {
@@ -72,91 +91,127 @@ export default {
       };
     }
   },
+  watch: {
+    currentDate: {
+      handler(value) {
+        const g = d3.select('#line-chart-group');
+
+        // TODO: date = translate x function
+        const dayDiff = parseInt(Math.abs(parseTime(value) - new Date('2019/12/31')) / 1000 / 60 / 60 / 24);
+        this.scale.t.x = -this.scale.gapPerDay * dayDiff;
+
+        const xt = this.scale.t.rescaleX(this.scale.x);
+        g.selectAll('.area').attr('d', this.area.x(d => xt(d.date)));
+        g.select('.axis--x').call(this.xAxis.scale(xt));
+      }
+    },
+  },
   methods: {
-    drawLineChart() {
+    async drawLineChart() {
       const vm = this;
-      const svg = d3.select('#line-chart')
-        .append('g')
-        .attr('class', 'line-chart-group');
 
-      const margin = { top: 20, right: 20, bottom: 30, left: 40 };
-      const width = 300;
-      const height = 100;
+      /** c: comfirmed, d: deaths */
+      let data = { tw: { c: [], d: [] }, global: { c: [], d: [] } } 
 
+      function parseData() {
+        const valuesArray = Object.values(vm.data);
+        const datesArray = Object.keys(vm.data);
+        valuesArray.forEach((e, i) => {
+          data.tw.c.push({
+            value: e.tw.Confirmed === '-' ? 0 : e.tw.Confirmed,
+            date: parseTime(datesArray[i])
+          });
+          data.tw.d.push({
+            value: e.tw.Deaths === '-' ? 0 : e.tw.Deaths,
+            date: parseTime(datesArray[i])
+          });
+          data.global.c.push({
+            value: e.global.Confirmed === '-' ? 0 : e.global.Confirmed,
+            date: parseTime(datesArray[i])
+          });
+          data.global.d.push({
+            value: e.global.Deaths === '-' ? 0 : e.global.Deaths,
+            date: parseTime(datesArray[i])
+          });
+        });
+      }
 
-      const x = d3.scaleTime().range([0, width]);
-      const y = d3.scaleLinear().range([height, 0]);
+      function renderChart() {
+        vm.svg = d3.select('#line-chart');
 
-      const xAxis = d3.axisBottom(x);
-      const yAxis = d3.axisLeft(y);
+        vm.size.margin = { top: 20, right: 50, bottom: 20, left: 50 };
+        vm.size.w = document.getElementById('line-chart').clientWidth - vm.size.margin.right - vm.size.margin.left;
+        vm.size.h = 100;
+        
+        vm.scale.x = d3.scaleTime().range([0, vm.size.w]);
+        vm.scale.y = d3.scaleLinear().range([vm.size.h, 0]);
+        vm.xAxis = d3.axisBottom(vm.scale.x).ticks(3);
+        // const yAxis = d3.axisLeft(y);
 
-      // const zoom = d3.zoom()
-      //     .scaleExtent([1, 32])
-      //     .translateExtent([[0, 0], [width, height]])
-      //     .extent([[0, 0], [width, height]])
-      //     .on("zoom", zoomed);
+        vm.area = d3.area()
+          .curve(d3.curveMonotoneX)
+          .x(d => vm.scale.x(d.date))
+          .y0(vm.size.h)
+          .y1(d => vm.scale.y(d.value));
 
-      const area = d3.area()
-        // .curve(d3.curveMonotoneX)
-        .x(d => x(d.date))
-        .y0(height)
-        .y1(d => y(d.price));
+        vm.svg.append('defs')
+          .append('clipPath')
+          .attr('id', 'clip')
+          .append('rect')
+          .attr('width', vm.size.w)
+          .attr('height', vm.size.h);
+        const g = vm.svg
+          .append('g')
+          .attr('id', 'line-chart-group')
+          .attr('transform', 'translate(' + vm.size.margin.left + ',' + vm.size.margin.top + ')');
 
-      svg.append("defs")
-        .append("clipPath")
-        .attr("id", "clip")
-        .append("rect")
-        .attr("width", width)
-        .attr("height", height);
+        vm.scale.x.domain(d3.extent(data.global.c, d => d.date));
+        vm.scale.y.domain([0, d3.max(data.global.c, d => d.value)]);
+      
+        g.append('path')
+          .datum(data.global.c)
+          .attr('class', 'area area--cases')
+          .attr('d', vm.area);
+        g.append('path')
+          .datum(data.global.d)
+          .attr('class', 'area area--deaths')
+          .attr('d', vm.area);
+        g.append('g')
+          .attr('class', 'axis axis--x')
+          .attr('transform', 'translate(0,' + vm.size.h + ')')
+          .call(vm.xAxis);
 
-      const g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        // g.append('g')
+        //     .attr('class', 'axis axis--y')
+        //     .call(yAxis);
 
+        const D_START = new Date(2019, 11, 30);
+        const D_END = new Date(2020, 0, 31);
 
+        vm.zoom = d3.zoom()
+          .scaleExtent([1, 32])
+          .translateExtent([[0, 0], [vm.size.w, vm.size.h]])
+          .extent([[0, 0], [vm.size.w, vm.size.h]])
+          .on('zoom', zoomed);
 
+        vm.svg.call(vm.zoom)
+          .transition()
+          .duration(1500)
+          .call(vm.zoom.transform, d3.zoomIdentity.scale(vm.size.w / (vm.scale.x(D_END) - vm.scale.x(D_START)))
+          .translate(-vm.scale.x(D_START), 0));
 
-      const data = [
-        {date: 1, price: 394.46},
-        {date: 2, price: 200},
-        {date: 3, price: 100}
-      ];
+        function zoomed() {
+          vm.scale.t = d3.event.transform;
+          vm.scale.gapPerDay = d3.event.transform.x / 1;
+          
+          const xt = vm.scale.t.rescaleX(vm.scale.x);
+          g.selectAll('.area').attr('d', vm.area.x(d => xt(d.date)));
+          g.select('.axis--x').call(vm.xAxis.scale(xt));
+        }
+      }
 
-
-
-      x.domain(d3.extent(data, d => d.date));
-      y.domain([0, d3.max(data, d => d.price)]);
-
-      g.append("path")
-          .datum(data)
-          .attr("class", "area")
-          .attr("d", area);
-
-      g.append("g")
-          .attr("class", "axis axis--x")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
-
-      g.append("g")
-          .attr("class", "axis axis--y")
-          .call(yAxis);
-
-      var d0 = new Date(2003, 0, 1),
-          d1 = new Date(2004, 0, 1);
-
-      // Gratuitous intro zoom!
-      // svg.call(zoom)
-      //   .transition()
-      //   .duration(1500)
-      //   .call(zoom.transform, d3.zoomIdentity
-      //   .scale(width / (x(d1) - x(d0)))
-      //   .translate(-x(d0), 0));
-
-      // function zoomed() {
-      //   var t = d3.event.transform, xt = t.rescaleX(x);
-      //   g.select(".area").attr("d", area.x(function(d) { return xt(d.date); }));
-      //   g.select(".axis--x").call(xAxis.scale(xt));
-      // }
-
+      await parseData();
+      await renderChart();
     },
   },
   mounted() {
@@ -165,7 +220,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '~/style/_mixins.scss';
 @import '~/style/_variables.scss';
 .line-chart {
@@ -253,9 +308,21 @@ export default {
     }
 
     .line-chart__chart__svg-container {
+      pointer-events: none;
       position: relative;
       width: 100%;
       height: 100%;
+
+
+      .area {
+        fill: none;
+      }
+      .area--cases {
+        fill: #f5f5f5;
+      }
+      .area--deaths {
+        fill: #797979;
+      }
     }
   }
 }
