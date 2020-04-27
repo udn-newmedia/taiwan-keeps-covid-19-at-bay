@@ -61,7 +61,7 @@ export default {
         w: null,
         h: null,
         margin: null
-      }
+      },
     };
   },
   computed: {
@@ -97,8 +97,12 @@ export default {
   watch: {
     deviceType: {
       handler() {
-        d3.select('#line-chart-group').remove();
-        this.drawLineChart();
+        this.$store.dispatch('updatedCurrentDate', '12-31-2019');
+        setTimeout(() => {
+          d3.select('#line-chart-group').remove();
+          this.svg.call(this.zoom.transform, d3.zoomIdentity);
+          this.drawLineChart();
+        }, 500);
       },
     },
     currentDate: {
