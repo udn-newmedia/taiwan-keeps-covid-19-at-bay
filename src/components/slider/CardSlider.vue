@@ -174,18 +174,21 @@ export default {
   .card-slider__side-anchor-container {
     position: absolute;
     z-index: 4;
-    bottom: 0;
+    top: 218px;
     right: 8px;
-    transform: translate(0, 125%);
+    transform: translate(0, 0);
     transition: .666s ease-in-out;
+    @include smob {
+      top: 200px;
+    }
     @include pad {
       right: -16px;
-
-      transform: translate(100%, 125%);
+      transform: translate(100%, 0);
     }
     @include pc {
       right: -16px;
-      transform: translate(100%, 125%);
+      top: 300px;
+      transform: translate(100%, 0);
     }
 
     &.card-slider__side-anchor-container--at-bottom {

@@ -1,6 +1,9 @@
 <template>
   <div
-    class="day-card"
+    :class="{
+      'day-card': true,
+      'day-card--active': activeFlag,
+    }"
     :id="id"
   >
     <!-- tw -->
@@ -64,6 +67,7 @@ export default {
       status: {
         ticking: false,
       },
+      activeFlag: false,
     };
   },
   computed: {
@@ -86,12 +90,14 @@ export default {
       if (!slider) return;
 
       const pos = slider.getBoundingClientRect();
-      const lineChartHeight = this.deviceType === 'pc' ? 240 : 200; 
+      const lineChartHeight = this.deviceType === 'pc' ? 250 : 210; 
       if (pos.top < lineChartHeight && pos.bottom > 0) {
         const currentDate = `${this.date[0] < 10 ? '0' + this.date[0] : this.date[0]}-${this.date[1] < 10 ? '0' + this.date[1] : this.date[1]}-${this.date[2]}`;
         this.$store.dispatch('updatedCurrentDate', currentDate);
       }
-      
+
+      if (pos.top < window.innerHeight * 0.7 && pos.bottom > -window.innerHeight * 0.7) this.activeFlag = true;
+      else this.activeFlag = false;
     },
     handleScroll() {
       if (!this.status.ticking) {
@@ -118,8 +124,16 @@ export default {
   position: relative;
   width: 100%;
   margin-bottom: 24px;
+  opacity: 0.3;
+  transform: scale(0.99);
+  transform-origin: center top;
+  transition: .5s;
   @include pc {
     margin-bottom: 32px;
+  }
+  &.day-card--active {
+    transform: scale(1);
+    opacity: 1;
   }
   .small {
     margin-bottom: 16px;

@@ -67,7 +67,11 @@ export default {
       const option = { offset: this.deviceType === 'pc' ? -239 : -199 };
 
       vueScrollTo.scrollTo(`#current-day-is-${m}-${data[y][m].date[0].day}-${y}`, option);
-      // this.sendGA(this.formatGA('PageBackTop'));
+      this.sendGA({
+        category: 'month',
+        action: 'click',
+        label: `${y}-${this.M_VOC[m]}`
+      });
     }
   },
 }

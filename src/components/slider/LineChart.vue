@@ -360,15 +360,16 @@ export default {
   .line-chart__table-container {
     position: relative;
     width: 100%;
-    height: 20%;
+    height: 25%;
     .line-chart__meta {
       position: relative;
       width: 100%;
       border-collapse: collapse;
       th, td {
-        padding: 0.1rem 16px;
-        font-size: 0.8rem;
+        padding: 0.1rem 8px;
+        font-size: 0.7rem;
         font-weight: normal;
+        white-space: nowrap;
         border-bottom: 1px solid #d3d3d3;
         @include pc {
           padding: 0;
@@ -403,7 +404,7 @@ export default {
     position: relative;
     overflow: hidden;
     width: 100%;
-    height: 80%;
+    height: 75%;
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
 
     .line-chart__chart__legend {
