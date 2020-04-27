@@ -1,4 +1,4 @@
-// @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap');
 
 *, *::before, *::after {
   margin: 0;
@@ -7,7 +7,8 @@
 }
 
 html, body {
-  font-family: source-han-sans-cjk-tc, "Noto Sans TC", "Microsoft JhengHei", Roboto, sans-serif;
+  font-family: Roboto, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  // font-family: source-han-sans-cjk-tc, "Noto Sans TC", "Microsoft JhengHei", Roboto, sans-serif;
 }
 
 h1, h2, h3, h4, p {
@@ -87,7 +88,7 @@ a, button {
   }
 
   p {
-    text-align: justify;
+    // text-align: justify;
     margin-bottom: 32px;
   }
 }

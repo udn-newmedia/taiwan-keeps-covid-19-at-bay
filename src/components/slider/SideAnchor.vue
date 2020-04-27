@@ -15,6 +15,7 @@
           'side-anchor__anchor-group-by-year__month': true,
           'side-anchor__anchor-group-by-year__month--active': +currentMonth === +month,
         }"
+        @click="scrollToCard(year, month)"
       >
         {{M_VOC[month]}}
       </ul>
@@ -23,9 +24,12 @@
 </template>
 
 <script>
+import { sendGaMethods } from '@/mixins/masterBuilder.js';
+import vueScrollTo from 'vue-scrollto';
 
 export default {
   name: 'SideAnchor',
+  mixins: [sendGaMethods],
   props: {
     time: {
       type: Object,
@@ -55,6 +59,15 @@ export default {
     },
     currentMonth() {
       return +this.$store.state.currentDate.split('-')[0];
+    }
+  },
+  methods: {
+    scrollToCard(y, m) {
+      const data = this.$store.state.data.epidemic;
+      const option = { offset: this.deviceType === 'pc' ? -239 : -199 };
+
+      vueScrollTo.scrollTo(`#current-day-is-${m}-${data[y][m].date[0].day}-${y}`, option);
+      // this.sendGA(this.formatGA('PageBackTop'));
     }
   },
 }

@@ -179,9 +179,12 @@ export default {
     transform: translate(0, 125%);
     transition: .666s ease-in-out;
     @include pad {
+      right: -16px;
+
       transform: translate(100%, 125%);
     }
     @include pc {
+      right: -16px;
       transform: translate(100%, 125%);
     }
 

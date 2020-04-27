@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { autoResize_3 } from '@/mixins/masterBuilder.js';
 
 /* month vocabulary */
 const M_VOC = {
@@ -49,6 +50,7 @@ const M_VOC = {
 
 export default {
   name: 'DayCard',
+  mixins: [autoResize_3],
   props: {
     data: {
       type: Object,
@@ -84,7 +86,8 @@ export default {
       if (!slider) return;
 
       const pos = slider.getBoundingClientRect();
-      if (pos.top < 0 && pos.bottom > 0) {
+      const lineChartHeight = this.deviceType === 'pc' ? 240 : 200; 
+      if (pos.top < lineChartHeight && pos.bottom > 0) {
         const currentDate = `${this.date[0] < 10 ? '0' + this.date[0] : this.date[0]}-${this.date[1] < 10 ? '0' + this.date[1] : this.date[1]}-${this.date[2]}`;
         this.$store.dispatch('updatedCurrentDate', currentDate);
       }

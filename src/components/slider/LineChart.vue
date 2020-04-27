@@ -27,15 +27,17 @@
       <div class="line-chart__chart__svg-container">
         <svg id="line-chart" width="100%" height="100%" />
       </div>
-      <!-- <h1>{{currentDate}}</h1> -->
     </div>
   </div>
 </template>
 
 <script>
 import * as d3 from 'd3';
+import { autoResize_3 } from '@/mixins/masterBuilder.js';
 
 const parseTime = d3.timeParse('%m-%d-%Y');
+const formatTime = d3.timeFormat('%d %b');
+const boundaryDistance = 14;
 Date.prototype.addDays = function(days) {
   this.setDate(this.getDate() + days);
   return this;
@@ -43,6 +45,7 @@ Date.prototype.addDays = function(days) {
 
 export default {
   name: 'LineChart',
+  mixins: [autoResize_3],
   data() {
     return {
       svg: null,
@@ -92,61 +95,104 @@ export default {
     }
   },
   watch: {
+    deviceType: {
+      handler() {
+        d3.select('#line-chart-group').remove();
+        this.drawLineChart();
+      },
+    },
     currentDate: {
       handler(value) {
+        const vm = this;
         const g = d3.select('#line-chart-group');
 
-        // TODO: date = translate x function
         const dayDiff = parseInt(Math.abs(parseTime(value) - new Date('2019/12/31')) / 1000 / 60 / 60 / 24);
-        this.scale.t.x = -this.scale.gapPerDay * dayDiff;
+        this.scale.t.x = -this.scale.gapPerDay * (dayDiff - boundaryDistance);
 
         const xt = this.scale.t.rescaleX(this.scale.x);
-        g.selectAll('.area').attr('d', this.area.x(d => xt(d.date)));
-        g.select('.axis--x').call(this.xAxis.scale(xt));
+        g.selectAll('.area').transition().duration(333).attr('d', this.area.x(d => xt(d.date)));
+        g.selectAll('.e-circle').transition().duration(333).attr('cx', d => xt(d.date));
+        // g.select('.axis--x').call(this.xAxis.scale(xt));
+        g.select('#current-date').text(formatTime(parseTime(vm.currentDate)));
+        g.select('#prev-date').text(formatTime(parseTime(vm.currentDate).addDays(-boundaryDistance)));
+        g.select('#next-date').text(formatTime(parseTime(vm.currentDate).addDays(+boundaryDistance)));
+        g.selectAll('.e-circle').classed("e-circle--c-active", function() {
+          if (this.id === `circle-c-${vm.currentDate}`) return true;
+          return false;
+        });
+        g.selectAll('.e-circle').classed("e-circle--d-active", function() {
+          if (this.id === `circle-d-${vm.currentDate}`) return true;
+          return false;
+        });
       }
     },
   },
   methods: {
-    async drawLineChart() {
+    drawLineChart() {
       const vm = this;
 
       /** c: comfirmed, d: deaths */
-      let data = { tw: { c: [], d: [] }, global: { c: [], d: [] } } 
+      let data = { c: [], d: [] };
+      let dataCircle = { c: [], d: [] };
 
       function parseData() {
         const valuesArray = Object.values(vm.data);
         const datesArray = Object.keys(vm.data);
         valuesArray.forEach((e, i) => {
-          data.tw.c.push({
-            value: e.tw.Confirmed === '-' ? 0 : e.tw.Confirmed,
-            date: parseTime(datesArray[i])
-          });
-          data.tw.d.push({
-            value: e.tw.Deaths === '-' ? 0 : e.tw.Deaths,
-            date: parseTime(datesArray[i])
-          });
-          data.global.c.push({
+          data.c.push({
             value: e.global.Confirmed === '-' ? 0 : e.global.Confirmed,
             date: parseTime(datesArray[i])
           });
-          data.global.d.push({
+          data.d.push({
             value: e.global.Deaths === '-' ? 0 : e.global.Deaths,
             date: parseTime(datesArray[i])
           });
         });
       }
 
+      function parseCircleData() {
+        const data = vm.$store.state.data.epidemic;
+        const years = Object.keys(data);
+
+        years.forEach(y => {
+          const months = Object.keys(data[y]);
+          months.forEach(m => {
+            const days = data[y][m].date;
+            days.forEach(d => {
+              const parsedM = m < 10 ? `0${m}` : m;
+              const parsedD = d.day < 10 ? `0${d.day}` : d.day;
+              const dataString = `${parsedM}-${parsedD}-${y}`
+
+              if (!vm.data[dataString].global) return;
+
+              /**
+               * { date: 12-31-2019, value: 123 }
+               */ 
+              dataCircle.c.push({
+                date: parseTime(dataString),
+                value: vm.data[dataString].global.Confirmed === '-' ? 0 : vm.data[dataString].global.Confirmed,
+                dateString: dataString
+              })
+              dataCircle.d.push({
+                date: parseTime(dataString),
+                value: vm.data[dataString].global.Deaths === '-' ? 0 : vm.data[dataString].global.Deaths,
+                dateString: dataString
+              })
+            })
+          })
+        })
+      }
+
       function renderChart() {
         vm.svg = d3.select('#line-chart');
 
-        vm.size.margin = { top: 20, right: 50, bottom: 20, left: 50 };
+        vm.size.margin = { top: 25, right: 50, bottom: 25, left: 50 };
         vm.size.w = document.getElementById('line-chart').clientWidth - vm.size.margin.right - vm.size.margin.left;
-        vm.size.h = 100;
+        vm.size.h = (vm.deviceType === 'pc' ? 175 : 150) - vm.size.margin.top - vm.size.margin.bottom;
         
         vm.scale.x = d3.scaleTime().range([0, vm.size.w]);
         vm.scale.y = d3.scaleLinear().range([vm.size.h, 0]);
-        vm.xAxis = d3.axisBottom(vm.scale.x).ticks(3);
-        // const yAxis = d3.axisLeft(y);
+        // vm.xAxis = d3.axisBottom(vm.scale.x).ticks(2);
 
         vm.area = d3.area()
           .curve(d3.curveMonotoneX)
@@ -154,64 +200,140 @@ export default {
           .y0(vm.size.h)
           .y1(d => vm.scale.y(d.value));
 
-        vm.svg.append('defs')
-          .append('clipPath')
-          .attr('id', 'clip')
-          .append('rect')
-          .attr('width', vm.size.w)
-          .attr('height', vm.size.h);
+        vm.scale.x.domain(d3.extent(data.c, d => d.date));
+        vm.scale.y.domain([0, d3.max(data.c, d => d.value)]);
+
         const g = vm.svg
           .append('g')
           .attr('id', 'line-chart-group')
           .attr('transform', 'translate(' + vm.size.margin.left + ',' + vm.size.margin.top + ')');
 
-        vm.scale.x.domain(d3.extent(data.global.c, d => d.date));
-        vm.scale.y.domain([0, d3.max(data.global.c, d => d.value)]);
-      
-        g.append('path')
-          .datum(data.global.c)
-          .attr('class', 'area area--cases')
-          .attr('d', vm.area);
-        g.append('path')
-          .datum(data.global.d)
-          .attr('class', 'area area--deaths')
-          .attr('d', vm.area);
-        g.append('g')
-          .attr('class', 'axis axis--x')
-          .attr('transform', 'translate(0,' + vm.size.h + ')')
-          .call(vm.xAxis);
+        function drawAreas() {
+          const path_g = g.append('g')
+            .attr('class', 'path-group');
 
-        // g.append('g')
-        //     .attr('class', 'axis axis--y')
-        //     .call(yAxis);
-
-        const D_START = new Date(2019, 11, 30);
-        const D_END = new Date(2020, 0, 31);
-
-        vm.zoom = d3.zoom()
-          .scaleExtent([1, 32])
-          .translateExtent([[0, 0], [vm.size.w, vm.size.h]])
-          .extent([[0, 0], [vm.size.w, vm.size.h]])
-          .on('zoom', zoomed);
-
-        vm.svg.call(vm.zoom)
-          .transition()
-          .duration(1500)
-          .call(vm.zoom.transform, d3.zoomIdentity.scale(vm.size.w / (vm.scale.x(D_END) - vm.scale.x(D_START)))
-          .translate(-vm.scale.x(D_START), 0));
-
-        function zoomed() {
-          vm.scale.t = d3.event.transform;
-          vm.scale.gapPerDay = d3.event.transform.x / 1;
-          
-          const xt = vm.scale.t.rescaleX(vm.scale.x);
-          g.selectAll('.area').attr('d', vm.area.x(d => xt(d.date)));
-          g.select('.axis--x').call(vm.xAxis.scale(xt));
+          path_g.append('path')
+            .datum(data.c)
+            .attr('class', 'area area--cases')
+            .attr('d', vm.area);
+          path_g.append('path')
+            .datum(data.d)
+            .attr('class', 'area area--deaths')
+            .attr('d', vm.area);
         }
+
+        function drawLine() {
+          const line_g = g.append('g')
+            .attr('class', 'line-group');
+          line_g.append('line')
+            .attr('class', 'indicator-line')
+            .attr('x1', vm.size.w * 0.5)
+            .attr('x2', vm.size.w * 0.5)
+            .attr('y1', 0)
+            .attr('y2', vm.size.h)
+        }
+
+        function drawCurrentDate() {
+          const text_g = g.append('g')
+            .attr('class', 'text-group');
+
+          text_g.append('text')
+            .attr('class', 'date-text')
+            .attr('id', 'current-date')
+            .attr('x', vm.size.w * 0.5)
+            .attr('y', vm.size.h)
+            .attr('dy', '18px')
+            .text(formatTime(parseTime(vm.currentDate)));
+
+          /* previous 14 days and next 14 days */
+          text_g.append('text')
+            .attr('class', 'date-text date-text--prev')
+            .attr('id', 'prev-date')
+            .attr('x', 0)
+            .attr('y', vm.size.h)
+            .attr('dy', '18px')
+            .text(formatTime(parseTime(vm.currentDate).addDays(-boundaryDistance)));
+
+          text_g.append('text')
+            .attr('class', 'date-text date-text--next')
+            .attr('id', 'next-date')
+            .attr('x', vm.size.w)
+            .attr('y', vm.size.h)
+            .attr('dy', '18px')
+            .text(formatTime(parseTime(vm.currentDate).addDays(+boundaryDistance)));
+        }
+
+        function drawCircles() {
+          const circles_g = g.append('g')
+            .attr('class', 'circle-group');
+
+          circles_g.selectAll("e-circle")
+            .data(dataCircle.c)
+            .enter()
+            .append("circle")
+            .attr('class', 'e-circle')
+            .attr('id', d => `circle-c-${d.dateString}`)
+            .attr("cx", d => vm.scale.x(d.date))
+            .attr("cy", d => vm.scale.y(d.value))
+            .attr("r", 2.5)
+
+          circles_g.selectAll("e-circle")
+            .data(dataCircle.d)
+            .enter()
+            .append("circle")
+            .attr('class', 'e-circle')
+            .attr('id', d => `circle-d-${d.dateString}`)
+            .attr("cx", d => vm.scale.x(d.date))
+            .attr("cy", d => vm.scale.y(d.value))
+            .attr("r", 2.5)
+        }
+
+        // function drawAxis() {
+        //   g.append('g')
+        //     .attr('class', 'axis axis--x')
+        //     .attr('transform', 'translate(0,' + vm.size.h + ')')
+        //     .call(vm.xAxis);
+        // }
+
+        function assignZoom() {
+          // const D_START = new Date(2019, 11, 15);
+          // const D_END = new Date(2020, 0, 15);
+          const D_START = parseTime(vm.currentDate).addDays(-boundaryDistance);
+          const D_END = parseTime(vm.currentDate).addDays(+boundaryDistance);
+
+          vm.zoom = d3.zoom()
+            .scaleExtent([1, 32])
+            .translateExtent([[0, 0], [vm.size.w, vm.size.h]])
+            .extent([[0, 0], [vm.size.w, vm.size.h]])
+            .on('zoom', zoomed);
+
+          vm.svg.call(vm.zoom)
+            .transition()
+            .duration(1500)
+            .call(vm.zoom.transform, d3.zoomIdentity.scale(vm.size.w / (vm.scale.x(D_END) - vm.scale.x(D_START)))
+            .translate(-vm.scale.x(D_START), 0));
+
+          function zoomed() {
+            vm.scale.t = d3.event.transform;
+            vm.scale.gapPerDay = d3.event.transform.x / (boundaryDistance);
+            
+            const xt = vm.scale.t.rescaleX(vm.scale.x);
+            g.selectAll('.area').attr('d', vm.area.x(d => xt(d.date)));
+            g.selectAll('.e-circle').attr('cx', d => xt(d.date));
+            // g.select('.axis--x').call(vm.xAxis.scale(xt));
+          }
+        }
+        drawAreas();
+        drawLine();
+        drawCurrentDate();
+        drawCircles();
+        // drawAxis();
+        assignZoom();
       }
 
-      await parseData();
-      await renderChart();
+      parseData();
+      parseCircleData();
+      renderChart();
     },
   },
   mounted() {
@@ -232,6 +354,8 @@ export default {
   }
 
   .line-chart__table-container {
+    position: relative;
+    width: 100%;
     height: 20%;
     .line-chart__meta {
       position: relative;
@@ -273,6 +397,7 @@ export default {
   }
   .line-chart__chart {
     position: relative;
+    overflow: hidden;
     width: 100%;
     height: 80%;
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
@@ -313,7 +438,6 @@ export default {
       width: 100%;
       height: 100%;
 
-
       .area {
         fill: none;
       }
@@ -322,6 +446,51 @@ export default {
       }
       .area--deaths {
         fill: #797979;
+      }
+
+      .indicator-line {
+        stroke-dasharray: 4, 4;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke: #979797;
+        stroke-width: 1px;
+      }
+
+      .date-text {
+        text-anchor: middle;
+        &.date-text--prev {
+          text-anchor: end;
+          fill: #d3d3d3;
+        }
+        &.date-text--next {
+          text-anchor: start;
+          fill: #d3d3d3;
+        }
+      }
+      text {
+        font-size: 0.8rem;
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+      }
+      .e-circle {
+        fill: #d3d3d3;
+        &.e-circle--c-active {
+          fill: #979797;
+        }
+        &.e-circle--d-active {
+          fill: #000000;
+        }
+      }
+
+      .axis.axis--x {
+        path.domain {
+          fill: none;
+          opacity: 0;
+        }
+        .tick {
+          line {
+            opacity: 0;
+          }
+        }
       }
     }
   }
