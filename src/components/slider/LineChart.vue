@@ -20,10 +20,10 @@
       </div>
       <div class="line-chart__chart__legend">
         <ul class="line-chart__chart__legend__item">
-          <span class="line-chart__chart__legend__item__color color--red" />Worldwide Cases
+          <span class="line-chart__chart__legend__item__color color--red" />Cases
         </ul>
         <ul class="line-chart__chart__legend__item">
-          <span class="line-chart__chart__legend__item__color color--black" />Worldwide Deaths
+          <span class="line-chart__chart__legend__item__color color--black" />Deaths
         </ul>
       </div>
     </div>
@@ -51,6 +51,7 @@ export default {
       zoom: null,
       area: null,
       xAxis: null,
+      yAxis: null,
       scale: {
         x: null,
         y: null,
@@ -196,11 +197,12 @@ export default {
 
         vm.size.margin = { top: 25, right: 50, bottom: 25, left: 50 };
         vm.size.w = document.getElementById('line-chart').clientWidth - vm.size.margin.right - vm.size.margin.left;
-        vm.size.h = (vm.deviceType === 'pc' ? 175 : 150) - vm.size.margin.top - vm.size.margin.bottom;
+        vm.size.h = (vm.deviceType === 'pc' ? 170 : 145) - vm.size.margin.top - vm.size.margin.bottom;
         
         vm.scale.x = d3.scaleTime().range([0, vm.size.w]);
         vm.scale.y = d3.scaleLinear().range([vm.size.h, 0]);
         // vm.xAxis = d3.axisBottom(vm.scale.x).ticks(2);
+        vm.yAxis = d3.axisRight(vm.scale.y).ticks(4).tickFormat(d => '-  ' + (d > 0 ? `${d / 1000000}m` : 0));
 
         vm.area = d3.area()
           .curve(d3.curveMonotoneX)
@@ -250,7 +252,7 @@ export default {
             .attr('id', 'current-date')
             .attr('x', vm.size.w * 0.5)
             .attr('y', vm.size.h)
-            .attr('dy', '18px')
+            .attr('dy', '24px')
             .text(formatTime(parseTime(vm.currentDate)));
 
           /* previous 14 days and next 14 days */
@@ -259,7 +261,7 @@ export default {
             .attr('id', 'prev-date')
             .attr('x', 0)
             .attr('y', vm.size.h)
-            .attr('dy', '18px')
+            .attr('dy', '24px')
             .text(formatTime(parseTime(vm.currentDate).addDays(-vm.boundaryDistance)));
 
           text_g.append('text')
@@ -267,7 +269,7 @@ export default {
             .attr('id', 'next-date')
             .attr('x', vm.size.w)
             .attr('y', vm.size.h)
-            .attr('dy', '18px')
+            .attr('dy', '24px')
             .text(formatTime(parseTime(vm.currentDate).addDays(+vm.boundaryDistance)));
         }
 
@@ -296,16 +298,19 @@ export default {
             .attr("r", 2.5)
         }
 
-        // function drawAxis() {
-        //   g.append('g')
-        //     .attr('class', 'axis axis--x')
-        //     .attr('transform', 'translate(0,' + vm.size.h + ')')
-        //     .call(vm.xAxis);
-        // }
+        function drawAxis() {
+          // g.append('g')
+          //   .attr('class', 'axis axis--x')
+          //   .attr('transform', 'translate(0,' + vm.size.h + ')')
+          //   .call(vm.xAxis);
+          g.append("g")
+            .attr("class", "axis axis--y")
+            .attr('transform', 'translate(' + (vm.size.w + 12) + ', 0)')
+            .call(vm.yAxis);
+        }
+
 
         function assignZoom() {
-          // const D_START = new Date(2019, 11, 15);
-          // const D_END = new Date(2020, 0, 15);
           const D_START = parseTime(vm.currentDate).addDays(-vm.boundaryDistance);
           const D_END = parseTime(vm.currentDate).addDays(+vm.boundaryDistance);
 
@@ -335,7 +340,7 @@ export default {
         drawLine();
         drawCurrentDate();
         drawCircles();
-        // drawAxis();
+        drawAxis();
         assignZoom();
       }
 
@@ -496,15 +501,22 @@ export default {
         }
       }
 
-      .axis.axis--x {
+      .axis.axis--x, .axis.axis--y {
         path.domain {
           fill: none;
           opacity: 0;
+          // fill: #dcdcdc;
         }
         .tick {
           line {
             opacity: 0;
           }
+        }
+      }
+      .axis.axis--y {
+        text {
+          fill: #797979;
+          text-anchor: start;
         }
       }
     }

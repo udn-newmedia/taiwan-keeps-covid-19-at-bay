@@ -21,11 +21,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '~/style/_mixins.scss';
 .taiwan-help-banner {
   position: relative;
   z-index: 10;
   width: 100%;
-  margin: 64px 0;
+  padding: 128px 0 64px 0;
+  @include pc {
+    padding: 256px 0 64px 0;
+  }
   img {
     width: 100%;
     object-fit: cover;

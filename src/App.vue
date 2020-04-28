@@ -15,9 +15,8 @@
     <CardSlider />
     <TaiwanHelpBanner />
     <PageFooter>
-      <!-- <p><a href="https://www.cdc.gov.tw/" target="_blank" rel="noopener" aria-label="data source" title="data source">衛福部疾管署</a></p> -->
       <FooterEditor>
-        <div class="team">Production Team:United Daily News Group (Taiwan)</div>
+        <div class="team">Production Team: <br>United Daily News Group (Taiwan)</div>
         <div class="editor">
           <div class="editor-title">Producer:</div>
           <ul>Lin Hsiu-Tzu</ul>
@@ -98,7 +97,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

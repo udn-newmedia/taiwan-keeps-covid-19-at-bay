@@ -4,7 +4,7 @@ import axios from 'axios';
 
 Vue.use(Vuex);
 
-// https://newmedia.udn.com.tw/taiwan-keeps-covid-19-at-bay/data/taiwan_can_help.json
+// const url = 'https://udn.com/newmedia/taiwan-keeps-covid-19-at-bay/data/taiwan_can_help.json';
 const url = './data/taiwan_can_help.json';
 
 export default new Vuex.Store({

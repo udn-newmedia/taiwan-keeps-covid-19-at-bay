@@ -105,7 +105,7 @@ export default {
 @import '~/style/_mixins.scss';
 .header-bar {
   position: fixed;
-  z-index: 1999;
+  z-index: 4999;
   top: 0;
   left: 0;
   width: 100%;

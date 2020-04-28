@@ -193,12 +193,14 @@ export default {
     }
 
     &.card-slider__side-anchor-container--at-bottom {
-      transform: translate(0, -100%);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(0, -125%);
       @include pad {
-        transform: translate(100%, -100%);
+        transform: translate(100%, -125%);
       }
       @include pc {
-        transform: translate(100%, -100%);
+        transform: translate(100%, -125%);
       }
     }
   }

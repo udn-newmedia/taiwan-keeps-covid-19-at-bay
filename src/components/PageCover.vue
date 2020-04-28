@@ -62,7 +62,7 @@ export default {
 }
 .page-cover__arrow {
   position: absolute;
-  bottom: 10%;
+  bottom: 16%;
   left: 50%;
   transform: translateX(-50%);
   @include pc {
