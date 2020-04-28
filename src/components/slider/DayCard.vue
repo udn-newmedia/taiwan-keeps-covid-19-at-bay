@@ -6,6 +6,12 @@
     }"
     :id="id"
   >
+    <AbstractCard
+      v-if="useAbstract"
+      :date="[date[0], date[2]]"
+      :data="$store.state.data.epidemic[date[2]][date[0]].abstract"
+    />
+    
     <!-- tw -->
     <div v-if="twData.policy.text || twData.policy.list" class="day-card__item day-card__item--tw">
       <p class="small">{{formattedDate}}</p>
@@ -34,6 +40,7 @@
 
 <script>
 import { autoResize_3 } from '@/mixins/masterBuilder.js';
+import AbstractCard from './AbstractCard.vue';
 
 /* month vocabulary */
 const M_VOC = {
@@ -53,6 +60,9 @@ const M_VOC = {
 
 export default {
   name: 'DayCard',
+  components: {
+    AbstractCard,
+  },
   mixins: [autoResize_3],
   props: {
     data: {
@@ -61,6 +71,10 @@ export default {
     date: {
       type: Array,
     },
+    useAbstract: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

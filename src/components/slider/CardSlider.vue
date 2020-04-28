@@ -34,10 +34,6 @@
           v-for="(month, index_m) in Object.keys(data.epidemic[year])" :key="index_m"
           class="card-slider__months-container"
         >
-          <MonthCard
-            :date="[month, year]"
-            :data="data.epidemic[year][month].abstract"
-          />
           <div
             v-for="(day, index_d) in Object.values(data.epidemic[year][month].date)" :key="index_d"
             class="card-slider__days-container"
@@ -45,6 +41,7 @@
             <DayCard
               :date="[month, day.day, year]"
               :data="day"
+              :useAbstract="+index_d === 0"
             />
           </div>
         </div>
@@ -60,7 +57,6 @@
 <script>
 import DayCard from './DayCard.vue';
 import LineChart from './LineChart.vue';
-import MonthCard from './MonthCard.vue';
 import SideAnchor from './SideAnchor.vue';
 
 export default {
@@ -68,7 +64,6 @@ export default {
   components: {
     DayCard,
     LineChart,
-    MonthCard,
     SideAnchor,
   },
   data() {
