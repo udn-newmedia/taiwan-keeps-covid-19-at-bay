@@ -3,29 +3,28 @@
     <div class="line-chart__table-container">
       <table class="line-chart__meta">
         <tr>
-          <th class="r1">Total</th>
-          <th class="r2">Taiwan</th>
+          <th class="r1">Taiwan</th>
+          <th class="r2">Worldwide</th>
           <th class="r3 hide">unit</th>
         </tr>
         <tr>
-          <td class="r1 text-l">{{currentTotalAmount.cases}} / {{currentTotalAmount.deaths}}</td>
-          <td class="r2 text-l">{{currentTaiwanAmount.cases}} / {{currentTaiwanAmount.deaths}}</td>
+          <td class="r1 text-l">{{currentTaiwanAmount.cases}} / {{currentTaiwanAmount.deaths}}</td>
+          <td class="r2 text-l">{{currentTotalAmount.cases}} / {{currentTotalAmount.deaths}}</td>
           <td class="r3">Cases/Deaths</td>
         </tr>
       </table>
     </div>
     <div class="line-chart__chart">
-      <div class="line-chart__chart__legend">
-        <ul class="line-chart__chart__legend__item">
-          <span class="line-chart__chart__legend__item__color color--red" />Cases
-        </ul>
-        <ul class="line-chart__chart__legend__item">
-          <span class="line-chart__chart__legend__item__color color--black" />Deaths
-        </ul>
-      </div>
-
       <div class="line-chart__chart__svg-container">
         <svg id="line-chart" width="100%" height="100%" />
+      </div>
+      <div class="line-chart__chart__legend">
+        <ul class="line-chart__chart__legend__item">
+          <span class="line-chart__chart__legend__item__color color--red" />Worldwide Cases
+        </ul>
+        <ul class="line-chart__chart__legend__item">
+          <span class="line-chart__chart__legend__item__color color--black" />Worldwide Deaths
+        </ul>
       </div>
     </div>
   </div>
@@ -34,10 +33,10 @@
 <script>
 import * as d3 from 'd3';
 import { autoResize_3 } from '@/mixins/masterBuilder.js';
+import vueScrollTo from 'vue-scrollto';
 
 const parseTime = d3.timeParse('%m-%d-%Y');
-const formatTime = d3.timeFormat('%d %b');
-const boundaryDistance = 14;
+const formatTime = d3.timeFormat('%b %d');
 Date.prototype.addDays = function(days) {
   this.setDate(this.getDate() + days);
   return this;
@@ -92,17 +91,22 @@ export default {
         cases: c === '-' ? 0 : c.toLocaleString(),
         deaths: d === '-' ? 0 : d.toLocaleString()
       };
+    },
+    boundaryDistance() {
+      if (this.deviceType === 'pc') return 50;
+      return 45;
     }
   },
   watch: {
     deviceType: {
       handler() {
-        this.$store.dispatch('updatedCurrentDate', '12-31-2019');
+        d3.select('#line-chart-group').remove();
+        this.svg.call(this.zoom.transform, d3.zoomIdentity);
+        vueScrollTo.scrollTo('#enter-anchor');
         setTimeout(() => {
-          d3.select('#line-chart-group').remove();
-          this.svg.call(this.zoom.transform, d3.zoomIdentity);
+          this.$store.dispatch('updatedCurrentDate', '12-31-2019');
           this.drawLineChart();
-        }, 500);
+        }, 1000);
       },
     },
     currentDate: {
@@ -111,15 +115,15 @@ export default {
         const g = d3.select('#line-chart-group');
 
         const dayDiff = parseInt(Math.abs(parseTime(value) - new Date('2019/12/31')) / 1000 / 60 / 60 / 24);
-        this.scale.t.x = -this.scale.gapPerDay * (dayDiff - boundaryDistance);
+        this.scale.t.x = -this.scale.gapPerDay * (dayDiff - this.boundaryDistance);
 
         const xt = this.scale.t.rescaleX(this.scale.x);
         g.selectAll('.area').transition().duration(333).attr('d', this.area.x(d => xt(d.date)));
         g.selectAll('.e-circle').transition().duration(333).attr('cx', d => xt(d.date));
         // g.select('.axis--x').call(this.xAxis.scale(xt));
         g.select('#current-date').text(formatTime(parseTime(vm.currentDate)));
-        g.select('#prev-date').text(formatTime(parseTime(vm.currentDate).addDays(-boundaryDistance)));
-        g.select('#next-date').text(formatTime(parseTime(vm.currentDate).addDays(+boundaryDistance)));
+        g.select('#prev-date').text(formatTime(parseTime(vm.currentDate).addDays(-this.boundaryDistance)));
+        g.select('#next-date').text(formatTime(parseTime(vm.currentDate).addDays(+this.boundaryDistance)));
         g.selectAll('.e-circle').classed("e-circle--c-active", function() {
           if (this.id === `circle-c-${vm.currentDate}`) return true;
           return false;
@@ -256,7 +260,7 @@ export default {
             .attr('x', 0)
             .attr('y', vm.size.h)
             .attr('dy', '18px')
-            .text(formatTime(parseTime(vm.currentDate).addDays(-boundaryDistance)));
+            .text(formatTime(parseTime(vm.currentDate).addDays(-vm.boundaryDistance)));
 
           text_g.append('text')
             .attr('class', 'date-text date-text--next')
@@ -264,7 +268,7 @@ export default {
             .attr('x', vm.size.w)
             .attr('y', vm.size.h)
             .attr('dy', '18px')
-            .text(formatTime(parseTime(vm.currentDate).addDays(+boundaryDistance)));
+            .text(formatTime(parseTime(vm.currentDate).addDays(+vm.boundaryDistance)));
         }
 
         function drawCircles() {
@@ -302,8 +306,8 @@ export default {
         function assignZoom() {
           // const D_START = new Date(2019, 11, 15);
           // const D_END = new Date(2020, 0, 15);
-          const D_START = parseTime(vm.currentDate).addDays(-boundaryDistance);
-          const D_END = parseTime(vm.currentDate).addDays(+boundaryDistance);
+          const D_START = parseTime(vm.currentDate).addDays(-vm.boundaryDistance);
+          const D_END = parseTime(vm.currentDate).addDays(+vm.boundaryDistance);
 
           vm.zoom = d3.zoom()
             .scaleExtent([1, 32])
@@ -319,7 +323,7 @@ export default {
 
           function zoomed() {
             vm.scale.t = d3.event.transform;
-            vm.scale.gapPerDay = d3.event.transform.x / (boundaryDistance);
+            vm.scale.gapPerDay = d3.event.transform.x / (vm.boundaryDistance);
             
             const xt = vm.scale.t.rescaleX(vm.scale.x);
             g.selectAll('.area').attr('d', vm.area.x(d => xt(d.date)));
@@ -377,11 +381,17 @@ export default {
         }
       }
       .r1 {
-        width: 50%;
-      }
-      .r2 {
         color: #ff4343;
         width: 30%;
+        @include pc {
+          width: 40%;
+        }
+      }
+      .r2 {
+        width: 50%;
+        @include pc {
+          width: 40%;
+        }
       }
       .r3 {
         width: 20%;

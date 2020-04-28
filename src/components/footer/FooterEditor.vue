@@ -42,5 +42,10 @@ export default {
   .source {
     text-align: center;
   }
+  .team {
+    text-align: center;
+    color: #000000;
+    margin-bottom: 32px;
+  }
 }
 </style>

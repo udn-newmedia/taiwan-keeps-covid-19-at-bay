@@ -8,7 +8,7 @@ const mainContent = contentGenerator('./contents/main_content.html');
 /* 正式路徑 */
 // const pathRoot = process.env.NODE_ENV === 'production' ? '__online__' : './';
 /* 測試路徑 */
-const pathRoot = process.env.NODE_ENV === 'http://nmdap.udn.com.tw/test/' ? '__test__' : './';
+const pathRoot = process.env.NODE_ENV === 'production' ? 'http://nmdap.udn.com.tw/test/taiwan-keeps-covid-19-at-bay/' : './';
 
 /* 作者 */
 const author = 'Lin Hsiu-Tzu(林秀姿), Tsai Pei-Jung(蔡佩蓉), Hung Hsin-Tzu(洪欣慈), Hsieh Wen-Chun(謝汶均), Su Shih-Yao(蘇士堯), Yang Juo-Yu(楊若榆), Chou Jung-Sheng(周融聖), New Media Center, Visual Design Center, Digital Center, Organized by United Daily News Group';

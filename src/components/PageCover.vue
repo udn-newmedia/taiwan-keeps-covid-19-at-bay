@@ -48,6 +48,7 @@ export default {
 .page-cover {
   position: relative;
   width: 100%;
+  height: 100vh;
   margin-bottom: 64px;
   @include pc {
     bottom: 12%;
@@ -55,6 +56,7 @@ export default {
   }
   img {
     width: 100%;
+    height: 100%;
     object-fit: contain;
   }
 }

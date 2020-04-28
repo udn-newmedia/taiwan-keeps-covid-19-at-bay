@@ -9,14 +9,15 @@
     />
     <PageBackTop />
     <ArticleContainer>
-      <p>The COVID-19 outbreak continues to spread around the globe. While governments are striving to take effective prevention measures, Taiwan is being praised by foreign media for its quick reaction and effective prevention measures.</p>
-      <p>What critical policy decisions made by Taiwan’s government to fight COVID-19?</p>
+      <p>While the rest of the world continues to experience many adverse impacts from the Novel Coronavirus (COVID-19) pandemic, Taiwan’s success during the fight against this viral infection has been notably recognized.</p>
+      <p>What has Taiwan done to keep COVID-19 at bay? The United Daily News has created an interactive timeline which summarizes the actions that the Taiwanese government has taken to combat COVID-19.</p>
     </ArticleContainer>
     <CardSlider />
     <TaiwanHelpBanner />
     <PageFooter>
       <!-- <p><a href="https://www.cdc.gov.tw/" target="_blank" rel="noopener" aria-label="data source" title="data source">衛福部疾管署</a></p> -->
       <FooterEditor>
+        <div class="team">Production Team:United Daily News Group (Taiwan)</div>
         <div class="editor">
           <div class="editor-title">Producer:</div>
           <ul>Lin Hsiu-Tzu</ul>
@@ -49,14 +50,14 @@
           <ul>Andrew Marino</ul>
         </div>
         <div class="source">
-          Sources: Taiwan CDC、WHO、Johns Hopkins University<br>
+          Sources: <a href="https://www.cdc.gov.tw/En" target="_blank" rel="noopener" aria-label="data source" title="data source">Taiwan CDC</a>、WHO、Johns Hopkins University<br>
           Published: April 30, 2020<br>
           Last Updated: {{ $store.state.data ? $store.state.data.updatedDate : null }}
         </div>
       </FooterEditor>
+      <FooterLogo />
       <FooterShare />
       <FooterFbComment />
-      <FooterLogo />
     </PageFooter>
     <PageBackTop />
   </div>

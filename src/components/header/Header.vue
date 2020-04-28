@@ -12,8 +12,7 @@
           @click="sendGA(formatGA('HeaderUdnLogo'))"
         >
           <a
-            href="https://udn.com/news/index"
-            target="_blank"
+            :href="href"
             rel="noopener"
             aria-label="聯logo"
             name="聯logo"
@@ -57,7 +56,7 @@ export default {
     },
     href: {
       type: String,
-      default: window.location.href,
+      default: document.querySelector('meta[property="og:url"]').content,
     },
   },
   components: {
@@ -106,7 +105,7 @@ export default {
 @import '~/style/_mixins.scss';
 .header-bar {
   position: fixed;
-  z-index: 4999;
+  z-index: 1999;
   top: 0;
   left: 0;
   width: 100%;

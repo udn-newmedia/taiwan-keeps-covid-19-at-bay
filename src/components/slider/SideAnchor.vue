@@ -1,6 +1,5 @@
 <template>
   <div class="side-anchor">
-
     <div
       v-for="(year, index) in Object.keys(time)" :key="index"
       :class="{

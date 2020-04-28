@@ -137,6 +137,7 @@ export default {
 @import '~/style/_variables.scss';
 .card-slider {
   position: relative;
+  z-index: 5000;
   padding-top: $lineChartHeight-mob;
   margin-bottom: $lineChartHeight-mob;
   @include pc {
@@ -192,12 +193,12 @@ export default {
     }
 
     &.card-slider__side-anchor-container--at-bottom {
-      transform: translate(0, 0);
+      transform: translate(0, -100%);
       @include pad {
-        transform: translate(100%, 0);
+        transform: translate(100%, -100%);
       }
       @include pc {
-        transform: translate(100%, 0);
+        transform: translate(100%, -100%);
       }
     }
   }
