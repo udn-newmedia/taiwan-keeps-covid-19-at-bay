@@ -63,7 +63,7 @@ export default {
   methods: {
     scrollToCard(y, m) {
       const data = this.$store.state.data.epidemic;
-      const option = { offset: this.deviceType === 'pc' ? -239 : -199 };
+      const option = { offset: this.deviceType === 'pc' ? -245 : -200 };
 
       vueScrollTo.scrollTo(`#current-day-is-${m}-${data[y][m].date[0].day}-${y}`, option);
 
@@ -94,7 +94,7 @@ export default {
 .side-anchor__anchor-group-by-year__month {
   color: #d3d3d3;
   font-size: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 0.8rem;
   transition: .333s ease-in-out;
   cursor: pointer;
   @include clean-tap;

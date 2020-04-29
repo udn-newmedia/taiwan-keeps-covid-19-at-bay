@@ -4,7 +4,11 @@ import axios from 'axios';
 
 Vue.use(Vuex);
 
-// const url = 'https://udn.com/newmedia/taiwan-keeps-covid-19-at-bay/data/taiwan_can_help.json';
+/* test environment */
+// const cors = 'https://cors-anywhere.herokuapp.com/';
+// const url = `${cors}https://newmedia.udn.com.tw/taiwan-keeps-covid-19-at-bay/data/taiwan_can_help.json`;
+
+/* online environment */
 const url = './data/taiwan_can_help.json';
 
 export default new Vuex.Store({

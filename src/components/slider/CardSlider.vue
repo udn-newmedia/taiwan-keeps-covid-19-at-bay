@@ -50,7 +50,7 @@
 
   </div>
   <div v-else class="card-slider">
-    loading...
+    <div class="card-slider__loading">loading...</div>
   </div>
 </template>
 
@@ -138,6 +138,9 @@ export default {
   @include pc {
     padding-top: $lineChartHeight-pc;
     margin-bottom: $lineChartHeight-pc;
+  }
+  .card-slider__loading {
+    text-align: center;
   }
 }
 .card-slider__fixed-element-container {
