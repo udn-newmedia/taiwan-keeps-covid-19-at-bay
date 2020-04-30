@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <url>
+    <loc>https://udn.com/newmedia/taiwan-keeps-covid-19-at-bay/</loc>
+    <image:image>
+      <image:title>How Taiwan Is Keeping COVID-19 at Bay</image:title>
+      <image:caption>While the rest of the world continues to experience many adverse impacts from the novel coronavirus (COVID-19) pandemic, Taiwan has successfully been keeping COVID-19 at bay through its early and persistent intervention measures.The United Daily News has created an interactive timeline which summarizes the actions taken by the Taiwanese government to combat COVID-19.</image:caption>
+      <image:loc>https://udn.com/newmedia/taiwan-keeps-covid-19-at-bay/meta.jpg</image:loc>
+      <image:license>https://udn.com/</image:license>
+      <image:geo_location>Taiwan</image:geo_location>
+    </image:image>
+  </url>
+
+
+</urlset>
