@@ -34,10 +34,6 @@
           v-for="(month, index_m) in Object.keys(data.epidemic[year])" :key="index_m"
           class="card-slider__months-container"
         >
-          <MonthCard
-            :date="[month, year]"
-            :data="data.epidemic[year][month].abstract"
-          />
           <div
             v-for="(day, index_d) in Object.values(data.epidemic[year][month].date)" :key="index_d"
             class="card-slider__days-container"
@@ -45,6 +41,7 @@
             <DayCard
               :date="[month, day.day, year]"
               :data="day"
+              :useAbstract="+index_d === 0"
             />
           </div>
         </div>
@@ -53,14 +50,13 @@
 
   </div>
   <div v-else class="card-slider">
-    loading...
+    <div class="card-slider__loading">loading...</div>
   </div>
 </template>
 
 <script>
 import DayCard from './DayCard.vue';
 import LineChart from './LineChart.vue';
-import MonthCard from './MonthCard.vue';
 import SideAnchor from './SideAnchor.vue';
 
 export default {
@@ -68,7 +64,6 @@ export default {
   components: {
     DayCard,
     LineChart,
-    MonthCard,
     SideAnchor,
   },
   data() {
@@ -143,6 +138,9 @@ export default {
   @include pc {
     padding-top: $lineChartHeight-pc;
     margin-bottom: $lineChartHeight-pc;
+  }
+  .card-slider__loading {
+    text-align: center;
   }
 }
 .card-slider__fixed-element-container {

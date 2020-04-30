@@ -60,7 +60,7 @@ export default {
   },
   computed: {
     shareTwitterUrl() {
-      return `https://twitter.com/intent/tweet?text=${encodeURIComponent(document.querySelector('meta[property="og:description"]').content)}%0D%0A%0D%0A`;
+      return `https://twitter.com/intent/tweet`;
     },
     shareLineUrl() {
       const sharedText = document.querySelector('title').innerHTML

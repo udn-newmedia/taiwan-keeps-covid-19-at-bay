@@ -9,8 +9,9 @@
     />
     <PageBackTop />
     <ArticleContainer>
-      <p>While the rest of the world continues to experience many adverse impacts from the Novel Coronavirus (COVID-19) pandemic, Taiwan’s success during the fight against this viral infection has been notably recognized.</p>
-      <p>What has Taiwan done to keep COVID-19 at bay? The United Daily News has created an interactive timeline which summarizes the actions that the Taiwanese government has taken to combat COVID-19.</p>
+      <p>While the rest of the world continues to experience many adverse impacts from the novel coronavirus (COVID-19) pandemic, Taiwan has successfully been keeping COVID-19 at bay through its early and persistent intervention measures.</p>
+      <p>The Taiwan Centers for Disease Control (Taiwan CDC) activated the Central Epidemic Command Center (CECC) on January 20th, 2020. Over the past 100 days, Taiwan has imposed border restrictions, home quarantines, a face-mask distribution system and other preventative measures to fight against this viral infection. Taiwan’s achievements in thwarting a nationwide outbreak have been globally recognized.</p>
+      <p>The United Daily News has created an interactive timeline which summarizes crucial moments both in Taiwan and worldwide during this pandemic, along with the actions taken by the Taiwanese government to combat COVID-19.</p>
     </ArticleContainer>
     <CardSlider />
     <TaiwanHelpBanner />
@@ -50,7 +51,7 @@
         </div>
         <div class="source">
           Sources: <a href="https://www.cdc.gov.tw/En" target="_blank" rel="noopener" aria-label="data source" title="data source">Taiwan CDC</a>、WHO、Johns Hopkins University<br>
-          Published: April 30, 2020<br>
+          Published: April 29, 2020<br>
           Last Updated: {{ $store.state.data ? $store.state.data.updatedDate : null }}
         </div>
       </FooterEditor>

@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     shareUrl() {
-      return `https://twitter.com/intent/tweet?text=${encodeURIComponent(document.querySelector('meta[property="og:description"]').content)}%0D%0A%0D%0A${encodeURIComponent(this.href)}`;
+      return `https://twitter.com/intent/tweet?text=${encodeURIComponent(this.href)}`;
     },
   },
 };

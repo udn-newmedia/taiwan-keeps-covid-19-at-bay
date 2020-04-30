@@ -259,7 +259,7 @@ export default {
           text_g.append('text')
             .attr('class', 'date-text date-text--prev')
             .attr('id', 'prev-date')
-            .attr('x', 0)
+            .attr('x', 24)
             .attr('y', vm.size.h)
             .attr('dy', '24px')
             .text(formatTime(parseTime(vm.currentDate).addDays(-vm.boundaryDistance)));
@@ -267,7 +267,7 @@ export default {
           text_g.append('text')
             .attr('class', 'date-text date-text--next')
             .attr('id', 'next-date')
-            .attr('x', vm.size.w)
+            .attr('x', vm.size.w - 24)
             .attr('y', vm.size.h)
             .attr('dy', '24px')
             .text(formatTime(parseTime(vm.currentDate).addDays(+vm.boundaryDistance)));

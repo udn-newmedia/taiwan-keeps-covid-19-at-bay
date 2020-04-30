@@ -1,11 +1,11 @@
 <template>
-  <div v-if="data" class="month-card">
-    <div class="month-card__time"><h3>{{formattedDate}}</h3></div>
-    <div class="month-card__list-name">{{data.measures.text}}</div>
-    <div v-if="data.measures.list" class="month-card__list">
+  <div v-if="data" class="abstract-card">
+    <div class="abstract-card__time"><h3>{{formattedDate}}</h3></div>
+    <div class="abstract-card__list-name">{{data.measures.text}}</div>
+    <div v-if="data.measures.list" class="abstract-card__list">
       <ul v-for="(item, index) in data.measures.list" :key="index">
-        <span class="month-card__list__left">●</span>
-        <span class="month-card__list__right">{{item}}</span>
+        <span class="abstract-card__list__left">●</span>
+        <span class="abstract-card__list__right">{{item}}</span>
       </ul>
     </div>
   </div>
@@ -30,13 +30,14 @@ const M_VOC = {
 }
 
 export default {
-  name: 'MonthCard',
+  name: 'AbstractCard',
   props: {
     date: {
       type: Array,
     },
     data: {
       type: Object,
+      default: null,
     },
   },
   computed: {
@@ -49,7 +50,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '~/style/_mixins.scss';
-.month-card {
+.abstract-card {
   position: relative;
   width: 100%;
   margin-bottom: 24px;
@@ -65,20 +66,20 @@ export default {
   background-color: #3a3a3a;
 }
 
-.month-card__time {
+.abstract-card__time {
   h3 {
     margin-bottom: 8px;
   }
 }
-.month-card__list-name {
+.abstract-card__list-name {
   color: #ff4343;
 }
-.month-card__list {
+.abstract-card__list {
   ul {
     display: flex;
     span {
       display: block;
-      &.month-card__list__left {
+      &.abstract-card__list__left {
         margin-right: 8px;
         font-size: 0.7rem;
         line-height: 1.6rem;
