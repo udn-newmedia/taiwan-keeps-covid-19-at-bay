@@ -1,7 +1,12 @@
 <template>
   <div id="app">
-    <PageIndicator />
-    <Header />
+    <PageIndicator />    
+    <HeaderTypeA
+      page-title="這一頁的標題"
+      textColor="#4e4e4e"
+      :outlink="menuOutlink"
+    >
+    </HeaderTypeA>
     <PageCover
       :srcMob="require('~/img/cover/mob.jpg')"
       :srcPad="require('~/img/cover/pad.jpg')"
@@ -76,9 +81,41 @@ import PageCover from '@/components/PageCover.vue';
 import PageFooter from '@/components/footer/PageFooter.vue';
 import PageIndicator from '@/components/layout/PageIndicator.vue';
 import TaiwanHelpBanner from '@/components/TaiwanHelpBanner.vue';
+import HeaderTypeA from '@/components/header/HeaderTypeA.vue'
 
 export default {
   name: 'App',
+  data () {
+    return {
+      menuOutlink: [
+        {
+          title: 'COVID-19 World Map',
+          url: 'https://udn.com/newmedia/2020/covid-19/',
+          active: false,
+        },
+        {
+          title: 'Timeline: COVID-19 in Taiwan',
+          url: 'https://udn.com/newmedia/2020/covid-19-timeline/',
+          active: false,
+        },
+        {
+          title: 'Links between COVID-19 Cases',
+          url: 'https://udn.com/newmedia/2020/covid-19-taiwan/',
+          active: false,
+        },
+        {
+          title: 'A Tribute to Taiwan\'s COVID-19 Heroes',
+          url: 'https://udn.com/newmedia/2020/tribute-covid-19-fighters/',
+          active: false,
+        },
+        {
+          title: 'How Taiwan Is Keeping COVID-19 at Bay?',
+          url: null,
+          active: true,
+        }
+      ]
+    }
+  },
   components: {
     ArticleContainer,
     CardSlider,
@@ -92,6 +129,7 @@ export default {
     PageFooter,
     PageIndicator,
     TaiwanHelpBanner,
+    HeaderTypeA
   },
   mounted() {
     this.$store.dispatch('getData');
